@@ -16,16 +16,25 @@ async function scrapeBooks() {
     const title = $(element).find("h3 a").attr("title");
     const price = $(element).find(".price_color").text();
 
-    books.push({
-      title,
-      price,
-    });
+    books.push({ title, price });
   });
 
   console.log(books);
 
   fs.writeFileSync("books.json", JSON.stringify(books, null, 2));
   console.log("Data saved to books.json");
-}
-scrapeBooks();
 
+  saveToCSV(books); // ✅ correct place
+}
+
+function saveToCSV(books) {
+  const header = "title,price\n";
+  const rows = books
+    .map(book => `"${book.title.replace(/"/g, '""')}",${book.price}`)
+    .join("\n");
+
+  fs.writeFileSync("books.csv", header + rows);
+  console.log("Data saved to books.csv");
+}
+
+scrapeBooks();
